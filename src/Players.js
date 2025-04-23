@@ -1,36 +1,68 @@
-
-    import "./player css.css";
+    import React, { useState } from 'react';
+    import './player css.css';
     import rec from './playerdata.jsx';
     import Card from './card';
-    import { useState } from 'react';
-
 
     export default function Player() {
-        const [gender, setGender] = useState("all");
+    // State to manage selected genders
+    const [selectedGenders, setSelectedGenders] = useState([]);
 
-    const Gul= (V)=>{
-        setGender(V.target.value);
-    }
+    // Handle checkbox changes
+    const handleGenderChange = (event) => {
+        const { value, checked } = event.target;
+        setSelectedGenders((prevSelected) => {
+        if (checked) {
+            // Add gender to the array
+            return [...prevSelected, value];
+        } else {
+            // Remove gender from the array
+            return prevSelected.filter((gender) => gender !== value);
+        }
+        });
+    };
 
-
+    // Filter data based on selected genders
+    const filteredData =
+        selectedGenders.length === 0
+        ? rec
+        : rec.filter((item) => selectedGenders.includes(item.type));
 
     return (
         <>
-        <select className='dropdown' onChange={Gul} value={gender}>
-    <option value="all">All</option>
-    <option value="men">Men</option>
-    <option value="women">women</option>
-    </select>
-        <div className='container'>
-        {
-        rec.filter((item)=>{return item.type===gender||gender==="all"})
-            .map((item)=>{return <Card pic={item.pic} ttl={item.player} team={item.team} gnd={item.type} sport={item.sport} />
-            })
-        }
+        <div className="filters">
+            <h3>Filter by Gender</h3>
+            <label>
+            <input
+                type="checkbox"
+                value="men"
+                checked={selectedGenders.includes('men')}
+                onChange={handleGenderChange}
+            />
+            Men
+            </label>
+            <label>
+            <input
+                type="checkbox"
+                value="women"
+                checked={selectedGenders.includes('women')}
+                onChange={handleGenderChange}
+            />
+            Women
+            </label>
+        </div>
 
-    </div>
+        <div className="container">
+            {filteredData.map((item, index) => (
+            <Card
+                key={index}
+                pic={item.pic}
+                ttl={item.player}
+                team={item.team}
+                gnd={item.type}
+                sport={item.sport}
+            />
+            ))}
+        </div>
         </>
-        
     );
     }
-
